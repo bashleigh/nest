@@ -2,6 +2,8 @@ import { MqttClientOptions } from '@nestjs/common/interfaces/external/mqtt-optio
 import { Transport } from '../enums/transport.enum';
 import { Server } from './../server/server';
 import { CustomTransportStrategy } from './custom-transport-strategy.interface';
+import { SQS } from 'aws-sdk';
+import { SendMessageRequest, ReceiveMessageRequest } from 'aws-sdk/clients/sqs';
 
 export type MicroserviceOptions =
   | GrpcOptions
@@ -10,7 +12,8 @@ export type MicroserviceOptions =
   | NatsOptions
   | MqttOptions
   | RmqOptions
-  | CustomStrategy;
+  | CustomStrategy
+  | SQSOptions;
 
 export interface CustomStrategy {
   strategy: Server & CustomTransportStrategy;
@@ -96,5 +99,18 @@ export interface RmqOptions {
     queueOptions?: any;
     socketOptions?: any;
     noAck?: boolean;
+  };
+}
+
+export type SQSReceiveMessageParams = Exclude<ReceiveMessageRequest, 'QueueUrl'>;
+
+export type SQSSendMessageParams = Exclude<SendMessageRequest, 'MessageBody'>;
+
+export interface SQSOptions {
+  transport?: Transport.SQS;
+  options?: {
+    client: SQS.Types.ClientConfiguration;
+    params: SQSSendMessageParams;
+    receiveParams?: SQSReceiveMessageParams;
   };
 }

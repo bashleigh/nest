@@ -1,6 +1,7 @@
 import { Transport } from '../../enums/transport.enum';
 import { MqttClientOptions } from '../external/mqtt-options.interface';
 import { CustomTransportStrategy } from './custom-transport-strategy.interface';
+import {SQS} from 'aws-sdk';
 
 export type MicroserviceOptions =
   | GrpcOptions
@@ -9,7 +10,8 @@ export type MicroserviceOptions =
   | NatsOptions
   | MqttOptions
   | RmqOptions
-  | CustomStrategy;
+  | CustomStrategy
+  | SQSOptions;
 
 export interface CustomStrategy {
   strategy?: CustomTransportStrategy;
@@ -91,5 +93,18 @@ export interface RmqOptions {
     isGlobalPrefetchCount?: boolean;
     queueOptions?: any;
     socketOptions?: any;
+  };
+}
+
+export type SQSReceiveMessageParams = Exclude<ReceiveMessageRequest, 'QueueUrl'>;
+
+export type SQSSendMessageParams = Exclude<SendMessageRequest, 'MessageBody'>;
+
+export interface SQSOptions {
+  transport?: Transport.SQS;
+  options?: {
+    client: SQS.Types.ClientConfiguration;
+    params: SQSSendMessageParams;
+    receiveParams?: SQSReceiveMessageParams;
   };
 }
